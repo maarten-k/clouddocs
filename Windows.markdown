@@ -50,7 +50,6 @@ Analogously to your laptop, your VM needs a hard drive where the operating syste
 
 1. **On the UI:** On the _Images_ tab (under _Virtual Resources_), click on the green _[+]_ button (on the top-left corner of the screen) to start creating a new `image`. A form will pop up.
 1. **On the UI:** On the form that popped up:
-  * click on the gray _Reset_ button at the bottom of it
   * type in a meaningful _Name_ (e.g.: **windows_iso**, we will use this name later)
   * type in a meaningful _Description_ (optional)
   * choose _Type_ _CDROM_
@@ -65,7 +64,6 @@ The best way to make physical hardware (namely: hard drives and network adapters
 
 1. **On the UI:** On the _Images_ tab (under _Virtual Resources_), click on the green _[+]_ button (on the top-left corner of the screen) to start creating a new `image`. A form will pop up.
 1. **On the UI:** On the form that popped up:
-  * click on the gray _Reset_ button at the bottom of it
   * type in a meaningful _Name_ (e.g.: **virtio_drivers_iso**, we will use this name later)
   * type in a meaningful _Description_ (optional)
   * choose _Type_ _CDROM_
@@ -79,14 +77,15 @@ The best way to make physical hardware (namely: hard drives and network adapters
 >**NOTE:**
 >
 >You can read more about Windows contextualization for OpenNebula here: 
-> * https://github.com/OpenNebula/addon-context-windows
-> * http://docs.opennebula.org/4.12/user/virtual_machine_setup/windows_context.html
+>
+> * [https://github.com/OpenNebula/addon-context-windows](https://github.com/OpenNebula/addon-context-windows)
+> * [http://docs.opennebula.org/4.12/user/virtual_machine_setup/windows_context.html](http://docs.opennebula.org/4.12/user/virtual_machine_setup/windows_context.html)
 
 On the HPC Cloud, VMs use the [contextualization](contextualization) mechanism to configure themselves. In particular, you will need to have 2 files on your VM so that it can actually configure itself. We will be making those available in this step so that, at a later step, we can make your VM use them. 
 
 1. **On the UI:** On the _Files & Kernels_ tab (under _Virtual Resources_), click on the green _[+]_ button (on the top-left corner of the screen) to start creating a new `file`. A form will pop up.
 1. **On the UI:** On the form that popped up:
-  * type in a meaningful _Name_ (e.g.: **context.ps1**, we will use this name later)
+  * type in _Name_: **context.ps1** (we will use this name later)
   * type in a meaningful _Description_ (optional)
   * choose _Type_ _CONTEXT_
   * leave _Datastore_ with _105: local_files_ssd_
@@ -102,6 +101,17 @@ Now, the other `file:
   * choose _Type_ _CONTEXT_
   * leave _Datastore_ with _105: local_files_ssd_
   * on the _Image location:_ group, choose radio button _Provide a path_; then, underneath, type the following URL in the _Path_ field: https://raw.githubusercontent.com/OpenNebula/addon-context-windows/master/startup.vbs
+1. **On the UI:** Click the green button _Create_ on the form, to submit it. A new `file` will show on the _Files_ list, and it will keep in status _LOCKED_ while data is being downloaded from the URL you wrote. When it is created it will come to status _READY_. 
+
+If we leave it here, then you VM will be configured only once ever. If you want the VM to be reconfigured every time it boots, then you need to delete a _flag_ file that prevents contextualisation from happening ever again. We have added a script that will delete this file for you every time Windows shuts down or reboots. Here is how you add it:
+
+1. **On the UI:** On the _Files & Kernels_ tab (under _Virtual Resources_), click on the green _[+]_ button (on the top-left corner of the screen) to start creating a new `file`. A form will pop up.
+1. **On the UI:** On the form that popped up:
+  * type in a meaningful _Name_ (e.g.: **shutdown.vbs**, we will use this name later)
+  * type in a meaningful _Description_ (optional)
+  * choose _Type_ _CONTEXT_
+  * leave _Datastore_ with _105: local_files_ssd_
+  * on the _Image location:_ group, choose radio button _Provide a path_; then, underneath, type the following URL in the _Path_ field: https://raw.githubusercontent.com/sara-nl/clouddocs/gh-pages/assets/shutdown.vbs
 1. **On the UI:** Click the green button _Create_ on the form, to submit it. A new `file` will show on the _Files_ list, and it will keep in status _LOCKED_ while data is being downloaded from the URL you wrote. When it is created it will come to status _READY_. 
 
 ### Create a template
@@ -130,7 +140,7 @@ Now that we have all components ready in the UI, we are ready to bring them toge
   * on the _Inputs group_, choose _Tablet_ on the first dropdown menu, then _USB_ on the second dropdown menu and finally click on the _Add_ button. A new entry will appear below those dropdowns with what you just selected.
 1.  **On the UI:** On the same _Create Template_ screen, on the _Context_ tab:
   * click on _Files_ on the left column of the screen
-  * make sure you check the check boxes for the files you created before; those are: **context.ps1** and **startup.vbs**
+  * make sure you check the check boxes for the files you created before; those are: **context.ps1**,  **startup.vbs** and **shutdown.vbs**
 1. **On the UI:** We are ready defining the `template`, so click on the green _Create_ button at the top of the screen. A new `template` will show on the _Templates_ list.
 
 ## Run the Windows installation
@@ -144,7 +154,7 @@ We will now create a VM and run the Windows installation on it.
 1. **On the UI:** We are ready defining the VM, so click on the green _Create_ button at the bottom of the form. A new VM will show on the _Virtual Machines_ list. It will go through several states (e.g.: PENDING, PROLOG...) until it reaches the RUNNING state. 
 1. **On the UI:** You can then start operating within your VM. Click on the _screen_-like button that you can see to the right of your VM on the list. It will pop-up the VNC console, so you should be able to see the welcome screen of your Windows installation.
 
-Now you need to install Windows, by following the steps you would normally follow. Only, with one caveat: you need to install the Virtio drivers, as pointed out before. 
+Now you need to install Windows with **custom** installation, by following the steps you would normally follow. Only, with one caveat: you need to install the Virtio drivers, as pointed out before. 
 
 ### Installing the Virtio drivers
 
@@ -152,9 +162,9 @@ While running the Windows installer, you will reach a step in which you have to 
 
 1. **On the Windows VM:** At the step where you need to choose a disk on which to install Windows, click on the _Load driver_ button (under the big white empty area). A dialogue pops up.
 1. **On the Windows VM:** On the pop-up dialogue, click on the _Browse..._ button. A _Browse for folder_ tree will pop-up now.
-1. **On the Windows VM:** We will start with the network interfaces driver. On the chooser tree, you will see two entries that represent two CD-ROM drives. Click on the one that holds the Virtio drivers (therefore, **not** the one labeled CONTEXT), and open folder _NetKVM_, then the folder that matches your Windows version, and then the 64-bit or 32-bit version depending on your Windows as well.
+1. **On the Windows VM:** We will start with the network interfaces driver. On the chooser tree, you will see two entries that represent two CD-ROM drives. Click on the one that holds the Virtio drivers (therefore, **not** the one labeled CONTEXT), and open folder `NetKVM`, then the folder that matches your Windows version, and then the 64-bit or 32-bit version depending on your Windows as well.
 1. **On the Windows VM:** After you chose the folder, a pop up will show the drivers that it could locate (or click on _Scan_ to refresh the list). Doubleclick the only entry that you should see, so that it is installed.
-1. **On the Windows VM:** Now we will repeat the process for the disks driver. On the chooser tree, you will see two entries that represent two CD-ROM drives. Click again on the one that holds the Virtio drivers (therefore, **not** the one labeled CONTEXT), and open folder called _virtiostor_, then the folder that matches your Windows version, and then the 64-bit or 32-bit version depending on your Windows as well.
+1. **On the Windows VM:** Now we will repeat the process for the disks driver. On the chooser tree, you will see two entries that represent two CD-ROM drives. Click again on the one that holds the Virtio drivers (therefore, **not** the one labeled CONTEXT), and open folder called `viostor`, then the folder that matches your Windows version, and then the 64-bit or 32-bit version depending on your Windows as well.
 1. **On the Windows VM:** Again, on the next screen, click on _Scan_ if the list of detected drivers is not updated. Then install the driver. At this point, the originally white area shows one entry: your disk.
 1. **On the Windows VM:** You can finally click on the drive to get Windows installed on it.
 
@@ -164,14 +174,18 @@ You can continue with the rest of the Windows installation process normally. The
 
 Once your freshly installed Windows starts, we will configure your VM so that it auto-configures itself on start up (e.g.: at this point, you can see that there is no active network connection, so you cannot even browse the web).
 
-1. **On the Windows VM:** Open a file explorer, and browse the _CONTEXT_ CD-ROM. You should be able to see at least 3 files on that CD-ROM. Two of them should be the ones we manually added to the _Context_ tab of the `template` some steps ago, called: _context.ps1_ and _startup.vbs_.
-1. **On the Windows VM:** From the _CONTEXT_ CD-ROM, copy both files **context.ps1** and **startup.vbs** to the **C:\** drive. They will thus become reachable at C:\context.ps1 and C:\startup.vbs.
-1. **On the Windows VM:** We must configure the C:\startup.vbs file as a start-up script, so that Windows runs it automatically upon booting. To do that, start by right-clicking on the Windows _Start_ button, and then choose option _Run_. A dialogue will pop up.
-1. **On the Windows VM:** On the dialogue that just popped up, type the following in the _Open:_ field: `gepedit.msc`. A new window titled _Local Group Policy Editor_ will show.
+1. **On the Windows VM:** Open a file explorer, and browse the _CONTEXT_ CD-ROM. You should be able to see at least 4 files on that CD-ROM. Three of them should be the ones we manually added to the _Context_ tab of the `template` some steps ago, called: _context.ps1_, _startup.vbs_ and _shutdown.vbs_.
+1. **On the Windows VM:** From the _CONTEXT_ CD-ROM, copy the 3 files **context.ps1**, **startup.vbs** and **shutdown.vbs** to the `C:\` drive. They will thus become reachable at C:\context.ps1, C:\startup.vbs and C:\shutdown.vbs.
+1. **On the Windows VM:** We must configure the C:\startup.vbs file as a start-up script, so that Windows runs it automatically upon booting. We must also configure the C:\shutdown.vbs file as a _shutdown script_, so that Windows runs it automatically upon shutting down. To do all of this, start by right-clicking on the Windows _Start_ button, and then choose option _Run_. A dialogue will pop up.
+1. **On the Windows VM:** On the dialogue that just popped up, type the following in the _Open:_ field: `gpedit.msc`. A new window titled _Local Group Policy Editor_ will show.
 1. **On the Windows VM:** On the _Local Group Policy Editor_, navigate to _Computer Configuration_ > _Windows Settings_ > _Scripts (Startup/Shutdown)_. Then doubleclick on _Startup_. A new _Startup Properties_ dialogue will pop up.
 1. **On the Windows VM:** On the _Startup Properties_ dialogue, click on the _Add_ button. A new _Add a Script_ dialogue will pop up.
-1. **On the Windows VM:** On the _Add a Script_ dialogue, click on the _Browse..._ button, and look there for the C:\startup.vbs file. A new entry will appear on the _Startup Properties_ dialogue indicating that you have added the new startup script.
+1. **On the Windows VM:** On the _Add a Script_ dialogue, click on the _Browse..._ button, and look there for the C:\startup.vbs file. A new entry will appear on the _Startup Properties_ dialogue indicating that you have added the new startup script. Click *OK*, then *Apply* and then *OK* again, to return to the _Scripts (Startup/Shutdown)_ window.
 1. **On the Windows VM:** You can reboot your Windows now. When it boots up, and (probably) after a while after you log in, your network adapters will stop showing the yellow warning icon and you should be able to browse the Internet now.
+1. **On the Windows VM:** We will now tackle the shutdown script. Doubleclick on _Shutdown_. A new _Shutdown Properties_ dialogue will pop up.
+1. **On the Windows VM:** On the _Shutdown Properties_ dialogue, click on the _Add_ button. A new _Add a Script_ dialogue will pop up.
+1. **On the Windows VM:** On the _Add a Script_ dialogue, click on the _Browse..._ button, and look there for the C:\shutdown.vbs file. A new entry will appear on the _Shutdown Properties_ dialogue indicating that you have added the new shutdown script. Click *OK* and *Apply*.
+1. **On the Windows VM:** You can reboot your Windows again. Make sure you have internet again.
 1. **On the UI:** You can now shut your VM down. We will remove all the installation media and prepare your VM for production.
 
 ## Prepare the VM for production
@@ -202,18 +216,21 @@ Having to connect to the VM via the VNC console on the web UI is somewhat tediou
 
 1. **In your local network:** Make sure your firewall (maybe in your home router) has port 3389 open for your laptop.
 1. **On the Windows VM:** Right-click on the Windows _Start_ button, and then choose option _Run_. A dialogue will pop up.
-1. **On the Windows VM:** On the dialogue that just popped up, type the following in the _Open:_ field: `gepedit.msc`. A new window titled _Local Group Policy Editor_ will show.
+1. **On the Windows VM:** On the dialogue that just popped up, type the following in the _Open:_ field: `gpedit.msc`. A new window titled _Local Group Policy Editor_ will show.
 1. **On the Windows VM:** On the _Local Group Policy Editor_, navigate to _Computer Configuration_ > _Administrative Templates_ > _Windows Components_ > _Remote Desktop Services_ > _Remote Desktop Session Host_ > _Security_. 
 1. **On the Windows VM:** Change the following two settings (doubleclick on each of them):
   * _Require use of specific security layer for remote (RDP) connections_ from _Not configured_ to _Enabled_, and then choose on the dropdown _Security Layer_, the value _RDP_.
-  * _Require user authentication for remote connections by using Network Level Authentications_ from _Not configured to _Disabled_.
+  * _Require user authentication for remote connections by using Network Level Authentications_ from _Not configured_ to _Disabled_.
 1. **On the Windows VM:** Restart your Windows.
 
 You should now be able to connect to your VM using a Remote Desktop client.
 
 ---
+
 ## Appendix: Alternative CPU topology configuration
+
 In the _Prepare your VM for production_ section, we wrote a way to configure your VM so that Windows will understand what to do with the cores the VM has available. However, some users have reported that the following helped them instead:
+
 ```
 <vcpu placement='static'>4</vcpu>
 <cputune>
@@ -226,6 +243,10 @@ In the _Prepare your VM for production_ section, we wrote a way to configure you
 <topology sockets='1' cores='4' threads='1'/>
 </cpu>
 ```
+
+>**NOTE:**
+>
+>Some users report suffering from very unstable (to the point of unuseable) systems with Windows **7** running on more than 16 cores.
 
 ## Appendix: Some Windows installation screenshots
 

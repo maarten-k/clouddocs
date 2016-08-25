@@ -30,7 +30,7 @@ The default Unity desktop does not support remote sessions as well as other desk
 * Update software repository and install necessary software
 
 ```bash
-  sudo apt-get install xrdp xubuntu-desktop
+  sudo apt-get install xrdp xubuntu-desktop tightvncserver
   apt-get update
 ```
 * login to a normal user account
@@ -77,7 +77,7 @@ Now you connect to your machine. However, Ubuntu default settings are to create 
 >
 >The following steps describe the procedure for setting up Xrdp in CentOS 6. Other distributions may require some variation, but the guidelines should remain analogous.
 
-1. **Open your firewall:** On your VM, modify the firewall settings to allow new inbound connections on port 3389, for example by adding the following line to /etc/sysconfig/iptables:
+* **Open your firewall:** On your VM, modify the firewall settings to allow new inbound connections on port 3389, for example by adding the following line to /etc/sysconfig/iptables:
 
 ```bash
   -A INPUT -m state --state NEW -m tcp -p tcp --dport 3389 -j ACCEPT
@@ -89,13 +89,13 @@ Now you connect to your machine. However, Ubuntu default settings are to create 
   service iptables reload
 ```
 
-2. **Install the Xrdp server:** In our distribution, install packages _tigervnc-server_ and _xrdp_:
+* **Install the Xrdp server:** In our distribution, install packages _tigervnc-server_ and _xrdp_:
 
 ```bash
   yum install -y tigervnc-server xrdp
 ```
 
-3. **Configure the Xrdp service:** make the start at boot time, and start it for this session already:
+* **Configure the Xrdp service:** make the start at boot time, and start it for this session already:
 
 ```bash
   chkconfig --levels 5 xrdp on

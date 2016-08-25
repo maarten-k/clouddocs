@@ -4,16 +4,19 @@ layout: default
 >**NOTE:**
 >
 >This is a distilled summary. For more information, you are advised to have a look at the official OpenNebula documentation pages:
-> * [basic contextualisation](http://docs.opennebula.org/4.12/user/virtual_machine_setup/bcont.html)
-> * [advanced contextualisation](http://docs.opennebula.org/4.12/user/virtual_machine_setup/cong.html)
+>
+> * [basic contextualisation](http://docs.opennebula.org/4.14/user/virtual_machine_setup/bcont.html)
+> * [advanced contextualisation](http://docs.opennebula.org/4.14/user/virtual_machine_setup/cong.html)
 
 ## Contextualization explained
 
 _Contextualization_ in OpenNebula refers to:
+
 * the act and effect of OpenNebula making information from the environment available meant for a VM to configure itself. This information is called the _context_.
 * the system that enables the former
 
 In summary, OpenNebula provides out-of-the-box facilities to tell a VM about:
+
 * SSH authentication: what certificates or passwords should the VM recognise to allow SSH access to it
 * Network configuration: how each `nic` on the VM must be configured (e.g.: IP addresses, network masks...)
 * Other variables: the VM receives a file with a list of ⟨key, value⟩ pairs that you specify in the `template`
@@ -84,3 +87,19 @@ For that, you first need to create an (or several) `Init File`(s) on the _Files 
 >**NOTE:**
 >
 >OpenNebula only delivers _contextualisation_ upon VM startup (from the external point of view). Therefore, any modification of the `template` or the `file`s that you make while the VM is running, will **not** be visible to that running VM. Further, even when you add `nic`s to a running VM, these will **not** be contextualised.
+
+#### Scripts caveats; cloud-init
+
+Aside from OpenNebula's contextualisation scripts, an alternative de-facto standard is emerging called [cloud-init](https://cloudinit.readthedocs.org/en/latest/). 
+
+> **NOTE:**
+>
+> OpenNebula's notes on cloud-init are available in [their documentation](  http://docs.opennebula.org/4.14/user/virtual_machine_setup/cloud-init.html)
+
+It looks like cloud-init's scripts may suffer from having Python3 as the default Python interpreter. If you need to install Python3, you are using cloud-init and you notice that your VM suddenly fails to be properly contextualised, you may want to have an alternate Python2 installation and have the init scripts use this instead.
+
+As a practical case, in Ubuntu, using all default Python2 and Python3 packages, a user reports having solved his problem by doing the following:
+
+1. Open the file `/usr/bin/cloud-init` for editing.
+2. Change the [shebang](https://en.wikipedia.org/wiki/Shebang_(Unix)) line to use the Python2 installation, like: `#!/usr/bin/python2.7`
+3. Reboot the OS so that the changes take effect.

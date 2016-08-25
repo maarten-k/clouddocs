@@ -16,10 +16,11 @@ We strongly recommend you use the SSH shell and full virtual desktop for product
 ## Find IP-address or Host name
 
 Before accessing your machine you need to find out the address of your VM. There are two methods you can use:
+
 * IP address
 * Host name
 
-The IP address can be found under _Virtual Resources->Virtual Machines_. The external IP to connect to starts with 145.100.XX.XX. If there is no IP address or only an IP address starting with 100.XX.XX.XX (which is an internal IP address you cannot reach through the Internet), please add an external `nic` to the VM.
+The IP address can be found under _Virtual Resources->Virtual Machines_. The external IP to connect to starts with 145.100.XX.XX. If there is no IP address or only an IP address starting with 10.100.XX.XX (which is an internal IP address you cannot reach through the Internet), please add an external `nic` to the VM.
 
 For every VM that you launch, the HPC Cloud assigns it a public host name. The host name can be found your VM's log on the UI. Go to _Virtual Resources->Virtual Machines_, click on your VM, then on the _Log_ tab and, at the top of the log, you will find the DNS address. 
 
@@ -40,9 +41,11 @@ You can predict the host name: `${vmname}.${projectname}.vm.surfsara.nl`
 
 ## SSH access
 
-### From a Linux or MacOS client
+### From a Linux or MacOS  or Windows (GitBash) client 
 
-MacOS and Linux come with built-in SSH clients. To use these, open a terminal.
+* MacOS and Linux come with built-in SSH clients. To use these, open a terminal.
+* Windows users can download and install [git for windows](https://git-for-windows.github.io/). Depending on your OS installation, choose between `Git-XXX-32-bit.exe` or `Git-XXX-64-bit.exe`. 
+  * For Windows users that want to use Putty, see the instructions for [Putty tools](putty-tools#ssh-access-from-a-windows-putty-client).
 
 #### Terminal only
 
@@ -52,7 +55,7 @@ In a terminal type
 ssh username@vmname.projectname-institute.vm.surfsara.nl
 ```
 
-to connect to your Virtual Machine.
+to connect to your Virtual Machine. You can replace the hostname with your VM's public IP-address and vice-versa.
 
 #### Terminal with Graphical User Interface
 
@@ -64,36 +67,13 @@ ssh -X username@vmname.projectname-institute.vm.surfsara.nl
 
 >**Note:**
 >
->You might need to install additional software on MacOS when using the `-X` flag.
-
-### From a Windows client
-
-#### Terminal only
-A well known SSH client for Windows is PuTTY. 
-
->**Note:**
->You can download Putty at http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html. 
->
->This client only works with a terminal and does **not** support a graphical user interface out of the box.
-
-To login to your VM:
-1. start Putty
-1. Fill in the Host Name (or IP address) the Host Name (or IP address) e.g. vmname.projectname-institute.vm.surfsara.nl or 145.100.XX.XX
-1. Select _Connection ->Data_ on the left hand panel
-1. Fill in your user name at _Auto-login username_ (for the first time you start a VM this should be _root_ )
-1. Select _Connection->SSH->Auth_ on the left-hand panel
-1. Select your private key by selecting the _browse_ button and navigate to your private key (with the `.ppk` extension)
-1. Select _Session_ on the left-hand panel
-1. Save the session by giving it a name under _saved sessions_ and click on the _save_ button.
-1. Click the _Open_ button.
-1. In case you have set a passphrase on your certificate, you will have to fill it in.
-1. Now you are logged on to your VM
+>You might need to install additional software on MacOS or Windows when using the `-X` flag.
 
 >**Note:**
 >The first time you start a session to a VM a warning is given that the machine is not cached. Select _yes_ to continue the session.
 
-#### Terminal with Graphical User Interface
-If you want to have graphical programs running on the VM whose windows are displayed on your local computer and you are running Windows on your local computer, then you are advised to have a look at Mobaxterm, an application you can read about more at: http://mobaxterm.mobatek.net/
+#### Terminal with Graphical User Interface for Windows only
+If you want to have graphical programs running on the VM whose windows are displayed on your local computer and you are running Windows on your local computer, then you are advised to have a look at Mobaxterm, an application you can read about more at: [http://mobaxterm.mobatek.net/](http://mobaxterm.mobatek.net/)
 
 ## Getting a Remote Desktop on a Linux VM
 
@@ -113,7 +93,7 @@ However, the button to launch that VNC client is placed in different locations d
 
 ![vnc_cloud2](images/vnc_cloud2.png)
 
-#### User view and Projectadmin view
+#### User view and groupadmin view
 To start VNC you can click the small display at the right side of your screen.
 
 ![vnc_userview](images/vnc_userview.png)

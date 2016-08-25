@@ -1,6 +1,9 @@
 ---
 layout: default
 ---
+
+# Virtual Machine states
+
 A VM can find itself on a number of different states. Each of those states have a name and a meaning. The state a VM is in also determines the set of states it can move to. Example state names are: PROLOG, BOOT, RUNNING...
 
 An _action_ triggers a state change. 
@@ -8,6 +11,15 @@ These actions can be triggered by a user on the UI or by the environment itself.
 You can see most of these on the UI:
 
 ![vm_actions_img](images/vm_actions.png)
+
+>**Note:**
+>
+> We recommend you **mainly** use the following actions for managing your VMs: 
+> * **Shutdown**: the VM will shut down gracefully. Click the dust bin button and then *Shutdown*.
+> * **Stop**: the VM keeps its changes for the next *Resume* action. Click on the stop square button and then *Stop*. A VM in STOPPED state does not consume quota.
+> * **Resume**: resumes a STOPPED VM. Click on the play button. It will bring the STOPPED to RUNNING state.
+>
+> If you ever find a VM in a status that these actions cannot trigger any further changes, you may want to contact us at helpdesk@surfsara.nl. 
 
 ## The play button
 
@@ -56,6 +68,10 @@ This state **keeps blocking the resources** that the VM holds, so your quota kee
 The OS running on the VM does **not** notice anything. Persistent and non-persistent images will keep their changes for the next _Resume_ action. If the VM is deleted in this status, non-persistent images will lose their changes, but persistent images will keep their changes.
 
 When you _Resume_ the VM (with the _Play_ button), it is immediately restored: first it will go to BOOT and then RUNNING. And the OS will boot again.
+
+> **Note:**
+>
+> You can use the state POWEROFF to change the capacity of your VM (if you have allowed this from the VM's template) by editing the CPU and RAM values under the _Capacity_ tab of the VM's extended information screen.
 
 ##  The stop button
 
@@ -209,15 +225,23 @@ The OS will go through a graceful shutdown sequence.
 
 You cannot _resume_ this VM; you can only instantiate its template again.
 
+>**Note:**
+>
+> If your VM is not reacting to the shutdown command from the cloud web interface, see [VM not reacting to Shutdown](http://doc.hpccloud.surfsara.nl/vm-not-reacting-to-shutdown).
+
 #### Shutdown hard
 
 Can only be triggered when the VM is in state RUNNING.
 
 _Shutdown_ eliminates the VM from the system, first going through the SHUTDOWN state. 
+No check is made if the VM actually reacts and shuts down.
+The OS running on the VM is terminated immediately and does not get a chance to properly shut down. 
+As usual with a shutdown, non-persistent images will lose their changes, but persistent images will keep their changes.
+The state of the disk data may be corrupted, however, due to possible caching by the OS.
+
 
 This state **frees resources** that the VM holds, so your quota does not tick.
 
-The OS running on the VM does **not** notice anything. Non-persistent images will lose their changes, but persistent images will keep their changes.
 
 You cannot _resume_ this VM; you can only instantiate its template again.
 
